@@ -1,6 +1,7 @@
 import argparse
 
 import engine
+import galaga_scene
 import scene
 
 if __name__ == '__main__':

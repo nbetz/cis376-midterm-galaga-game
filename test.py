@@ -14,8 +14,8 @@ timeStep = 1.0 / 60
 vel_iters, pos_iters = 6, 2
 
 class TestScene(scene.Scene):
-    def __init__(self, tile_size: int):
-        super().__init__(tile_size)
+    def __init__(self):
+        super().__init__()
 
     def initial_grid(self, **kwargs):
         self.game_objects.append(Ball())
@@ -24,7 +24,7 @@ class TestScene(scene.Scene):
         self.game_objects.append(Ground(6, 4, 1, .25))
         self.game_objects.append(Updater())
 
-testscene = TestScene(30)
+testscene = TestScene()
 
 class Ground(game_object.GameObject):
     def __init__(self, x, y, w, h):

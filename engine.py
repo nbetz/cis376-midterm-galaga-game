@@ -67,7 +67,7 @@ class Engine:
                 self._active_scene.update_all_objects(type="main")
             # DISPLAY
             self.screen.fill(pygame.Color('black'))
-            image = pygame.image.load('Space_background.PNG')
+            image = pygame.image.load('assets\spaceBackground.jpg')
             self.screen.blit(image, (0, 0))
             self.screen.blit(image, (490, 0))
             self._active_scene.draw()
