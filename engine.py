@@ -66,7 +66,10 @@ class Engine:
                 # update objects if win condition isn't met
                 self._active_scene.update_all_objects(type="main")
             # DISPLAY
-            self.screen.fill(pygame.Color('dimgrey'))
+            self.screen.fill(pygame.Color('black'))
+            image = pygame.image.load('Space_background.PNG')
+            self.screen.blit(image, (0, 0))
+            self.screen.blit(image, (490, 0))
             self._active_scene.draw()
             pygame.display.flip()
             self.delta_time = self.clock.tick(self._fps)
@@ -87,7 +90,7 @@ class Engine:
                 kwargs: a dictionary of named parameters to be passed to the initial_grid function of the scene to determine what happens on scene creation.
         """
         self._active_scene = game_scene
-        self.screen.fill(pygame.Color('dimgrey'))
+        self.screen.fill(pygame.Color('black'))
         game_scene.initial_grid(**kwargs)
         game_scene.draw()
         pygame.display.flip()

@@ -25,7 +25,7 @@ class Scene:
     user_object: GameObject of the player
     tile_size: int representing how large of a square each sprite should be.
     """
-    def __init__(self, tile_size: int):
+    def __init__(self):
         all_sprites = pygame.sprite.Group()
         drawable = pygame.sprite.Group()
         self.game_objects = []
