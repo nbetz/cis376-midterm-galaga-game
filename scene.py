@@ -32,7 +32,6 @@ class Scene:
         self.groups = {"all_sprites": all_sprites, "drawable": drawable}
         self.rand = random.Random
         self.user_object: game_object.GameObject
-        self.tile_size = tile_size
 
     def update_all_objects(self, *args, **kwargs):
         """calls update() method for all updatable game objects in scene
