@@ -27,8 +27,9 @@ class Scene:
     """
     def __init__(self, tile_size: int):
         all_sprites = pygame.sprite.Group()
+        drawable = pygame.sprite.Group()
         self.game_objects = []
-        self.groups = {"all_sprites": all_sprites}
+        self.groups = {"all_sprites": all_sprites, "drawable": drawable}
         self.rand = random.Random
         self.user_object: game_object.GameObject
         self.tile_size = tile_size
@@ -46,7 +47,7 @@ class Scene:
     def draw(self):
         """calls pygame draw function for all objects in scene
         """
-        self.groups.get("all_sprites").draw(engine.Engine.screen)
+        self.groups.get("drawable").draw(engine.Engine.screen)
 
     def check_win(self) -> bool:
         """checks if win condition is met in scene.
