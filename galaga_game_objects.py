@@ -61,4 +61,19 @@ class Enemy(game_object.GameObject):
         self.rect.x = self.x
         self.rect.y = self.y
         pygame.draw.rect(self.image, (255, 255, 255), self.rect)
+        self.flag = 0
         self.dirty = 0
+
+    def update(self, **kwargs):
+        print(self.y)
+        if self.flag == 30:
+            self.flag = self.flag + 1
+            self.y = self.y + 10
+            self.rect.y = self.rect.y + 10
+        elif self.flag == 60:
+            self.flag = 0
+            self.y = self.y - 10
+            self.rect.y = self.rect.y - 10
+        else:
+            self.flag = self.flag + 1
+
