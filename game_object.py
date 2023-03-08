@@ -74,9 +74,25 @@ class Player(GameObject):
         if kwargs.get('type') == 'keyup':
             event = kwargs.get('key')
             if event == pygame.K_w or event == pygame.K_UP:
-                self.body.ApplyForce(b2Vec2(0, -1), self.body.position, True)
+                self.body.linearVelocity = (0,0)
             elif event == pygame.K_s or event == pygame.K_DOWN:
-                self.body.ApplyForce(b2Vec2(0, 1), self.body.position, True)
+                self.body.linearVelocity = (0,0)
+
             self.dirty = 0
+
+class Enemy(GameObject):
+    def __init__(self, in_scene: "GalagaScene", x, y):
+        super().__init__(x, y, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'), in_scene.groups.get('enemies'))
+        self.image = pygame.Surface([45, 45])
+        self.image.fill((255, 255, 255))
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        pygame.draw.rect(self.image, (255, 255, 255), self.rect)
+        self.flag = 1
+        self.dirty = 0
+
+    #def update(self):
+        #if self.flag = 1:
 
 

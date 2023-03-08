@@ -7,7 +7,7 @@ import scene
 if __name__ == '__main__':
     # setup command line arguments to accept input for width, height, fps,
     parser = argparse.ArgumentParser()
-    parser.add_argument('--fps', nargs='?', type=int, default=10,
+    parser.add_argument('--fps', nargs='?', type=int, default=60,
                         help='Specify the fps for the game')
     parser.add_argument('--tile_size', nargs='?', type=int, default=30,
                         help='Specify the size of the tiles for the game')

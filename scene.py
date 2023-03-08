@@ -76,3 +76,6 @@ class Scene:
         """
         self.game_objects.append(game_object.Updater(self))
         self.game_objects.append(game_object.Player(self))
+        for rows in range(100, 550, 90):
+            for cols in range(400, 850, 90):
+                self.game_objects.append(game_object.Enemy(self, cols, rows))
