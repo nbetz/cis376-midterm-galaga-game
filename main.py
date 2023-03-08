@@ -13,7 +13,7 @@ if __name__ == '__main__':
                         help='Specify the size of the tiles for the game')
     parser.add_argument('--width', nargs='?', type=int, default=980,
                         help='Specify the width of the screen')
-    parser.add_argument('--height', nargs='?', type=int, default=882,
+    parser.add_argument('--height', nargs='?', type=int, default=600,
                         help='Specify the height of the screen')
     args = parser.parse_args()
 

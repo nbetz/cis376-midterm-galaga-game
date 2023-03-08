@@ -6,6 +6,7 @@ Typical usage example:
   game_scene = scene.Scene()
   engine.add_scene(game_scene)
 """
+from Box2D import b2World
 
 import game_object
 import pygame
@@ -32,6 +33,17 @@ class Scene:
         self.groups = {"all_sprites": all_sprites, "drawable": drawable}
         self.rand = random.Random
         self.user_object: game_object.GameObject
+        enemies = pygame.sprite.Group()
+        player = pygame.sprite.Group()
+        player_shot = pygame.sprite.Group()
+        enemy_shot = pygame.sprite.Group()
+        self.groups.update({"enemies": enemies, "player": player, "player_shot": player_shot, "enemy_shot": enemy_shot})
+        self.w2b = 1 / 100
+        self.b2w = 100
+        self.timeStep = 1.0 / 60
+        self.vel_iters = 6
+        self.pos_iters = 2
+        self.world = b2World((0, 0), doSleep=False)
 
     def update_all_objects(self, *args, **kwargs):
         """calls update() method for all updatable game objects in scene
@@ -62,4 +74,5 @@ class Scene:
         Args:
             **kwargs: A dictionary of named arguments to be used as initialization parameters.
         """
-        pass
+        self.game_objects.append(game_object.Updater(self))
+        self.game_objects.append(game_object.Player(self))

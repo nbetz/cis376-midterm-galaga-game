@@ -57,6 +57,8 @@ class Engine:
                     self._active_scene.update_all_objects(type="click", position=event.pos)
                 elif event.type == pygame.KEYDOWN:
                     self._active_scene.update_all_objects(type="keydown", key=event.key)
+                elif event.type == pygame.KEYUP:
+                    self._active_scene.update_all_objects(type="keyup", key=event.key)
 
             # Update
             # check win condition

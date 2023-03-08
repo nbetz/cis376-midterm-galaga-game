@@ -1,24 +1,34 @@
 
 import pygame
+from Box2D import b2World
+import galaga_game_objects
 import scene
-import game_object
-import engine
 
 
 class GalagaScene(scene.Scene):
     def __init__(self):
-        super().__init__(self)
+        super().__init__()
         enemies = pygame.sprite.Group()
         player = pygame.sprite.Group()
-        all_sprites = pygame.sprite.Group()
-        self.groups.update({"enemies": enemies, "player": player, "all_sprites": all_sprites})
+        player_shot = pygame.sprite.Group()
+        enemy_shot = pygame.sprite.Group()
+
+        self.groups.update({"enemies": enemies, "player": player, "player_shot": player_shot, "enemy_shot": enemy_shot})
+        self.w2b = 1 / 100
+        self.b2w = 100
+        self.timeStep = 1.0 / 60
+        self.vel_iters = 6
+        self.pos_iters = 2
+        self.world = b2World((0, 0), doSleep=False)
+
 
 
     def initial_scene(self):
-        pass
+        self.game_objects.append(galaga_game_objects.Updater(self))
+        self.game_objects.append(galaga_game_objects.Player(self))
 
-    def draw(self):
-        pass
+    # def draw(self):
+    #     pass
 
     def check_win(self) -> bool:
         return False

@@ -1,47 +1,19 @@
-"""Game objects built upon pygame.sprite.Dirtysprite
-
-Provides basic functions for creating GameObjects for a game.
-"""
-
 import pygame
-from Box2D import b2Vec2, b2FixtureDef, b2CircleShape
+from Box2D import b2CircleShape, b2FixtureDef, b2Vec2
 
-from pygame.sprite import AbstractGroup
+import game_object
+import scene
 
-
-class GameObject(pygame.sprite.DirtySprite):
-    """GameObject class providing basic GameObject info ontop of pygame.sprite.DirtySprite
-
-        Intended to be extended by other classes to provide a base for creating game objects.
-
-        Attributes:
-            x: int for x position of object.
-            y: int for x position of object.
-            last_x: int for last x value during update sequence.
-            last_y: int for last y value during update sequence.
-            in_scene: scene.Scene that the object belongs to
-            *groups: Tuple of pygame Groups that the object belongs to
-            image: image of the sprite to be drawn.
-            rect: bounding box of the sprite.
-        """
-    def __init__(self, x: int, y: int, in_scene: "Scene", *groups: AbstractGroup):
-        super().__init__(*groups)
-        self.x = x
-        self.y = y
-        self.last_x = x
-        self.last_y = y
-        self.scene = in_scene
-
-class Updater(GameObject):
-    def __init__(self, in_scene: "Scene"):
+class Updater(game_object.GameObject):
+    def __init__(self, in_scene: "GalagaScene"):
         super().__init__(0, 0, in_scene, in_scene.groups.get('all_sprites'))
 
     def update(self, **kwargs):
         self.scene.world.Step(self.scene.timeStep, self.scene.vel_iters, self.scene.pos_iters)
         self.scene.world.ClearForces()
 
-class Player(GameObject):
-    def __init__(self, in_scene: "Scene"):
+class Player(game_object.GameObject):
+    def __init__(self, in_scene: "GalagaScene"):
         super().__init__(50, 400, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'), in_scene.groups.get('player'))
         self.body = self.scene.world.CreateDynamicBody(position=(0.5, 4))
         shape = b2CircleShape(radius=.25)
@@ -78,5 +50,3 @@ class Player(GameObject):
             elif event == pygame.K_s or event == pygame.K_DOWN:
                 self.body.ApplyForce(b2Vec2(0, 1), self.body.position, True)
             self.dirty = 0
-
-
