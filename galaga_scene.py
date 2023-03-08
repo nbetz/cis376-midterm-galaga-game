@@ -26,8 +26,8 @@ class GalagaScene(scene.Scene):
     def initial_scene(self):
         self.game_objects.append(galaga_game_objects.Updater(self))
         self.game_objects.append(galaga_game_objects.Player(self))
-        for rows in range(100, 550, 90):
-            for cols in range(400, 850, 90):
+        for rows in range(100, 550, 75):
+            for cols in range(400, 850, 75):
                 self.game_objects.append(galaga_game_objects.Enemy(self, cols, rows))
 
     def check_win(self) -> bool:
