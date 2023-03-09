@@ -37,6 +37,7 @@ class Player(game_object.GameObject):
             if event == pygame.K_SPACE:
                 if len(collided) > 0:
                     print('pew pew')
+                    # this is where I was trying to add the object to the scene
             elif event == pygame.K_w or event == pygame.K_UP:
                 self.body.ApplyForce(b2Vec2(0, 1), self.body.position, True)
             elif event == pygame.K_s or event == pygame.K_DOWN:
@@ -76,4 +77,38 @@ class Enemy(game_object.GameObject):
             self.rect.y = self.rect.y - 10
         else:
             self.flag = self.flag + 1
+
+class Projectile(game_object.GameObject):
+    #x pos and y pos can be player/enemy position or some value based on the positon
+    # type will be a number that defines what type of projectile it needs to be
+    def __init__(self, in_scene: "GalagaScene", xPos, yPos, type):
+        print("creating")
+        super().__init__(xPos, yPos, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'), in_scene.groups.get('projectiles'))
+        self.body = self.scene.world.CreateDynamicBody(position=(xPos, yPos))
+        shape = b2CircleShape(radius= .05)
+        # include an if statement here that changes these based on projectile type
+        fixDef = b2FixtureDef(shape=shape, friction=0.3, restitution=.5, density=.5)
+        self.dirty = 2
+        d = .05 * self.scene.b2w * 2
+        self.image = pygame.Surface((d,d), pygame.SCRALPHA, 32)
+        self.image.convert_alpha()
+        self.rect = self.image.get_rect()
+        pygame.draw.circle(self.image, (225, 225, 225), self.rect.center, .05 * self.scene.b2w)
+        self.dirty = 0
+        # i'm thinking type could just be an integer, where 0 represents a player projectile and then other numbers
+        # represent the other types of projectiles
+        self.proType = type
+
+    def update(self, **kwargs):
+        self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
+        collided = pygame.sprite.spritecollide(self, self.scene.groups.get('drawable'), False)
+        # i want this to be logic that makes the bullet disappear when it collides with an enemy or goes off-screen
+        #don't think it actually does that though, i just put random values based on my estimate for screen size
+        if len(collided) > 1 or self.body.positon[1] > 300:
+            self.kill()
+            #remove from game objects
+        elif self.proType == 0:
+            # might only do this once, have a boolean that keeps track
+            #im hoping this just makes the bullet go straight at some speed?
+            self.body.ApplyLinearImpulseToCenter((0, 5), True)
 

@@ -37,7 +37,8 @@ class Scene:
         player = pygame.sprite.Group()
         player_shot = pygame.sprite.Group()
         enemy_shot = pygame.sprite.Group()
-        self.groups.update({"enemies": enemies, "player": player, "player_shot": player_shot, "enemy_shot": enemy_shot})
+        projectiles = pygame.sprite.Group()
+        self.groups.update({"enemies": enemies, "player": player, "player_shot": player_shot, "enemy_shot": enemy_shot, "projectiles":projectiles})
         self.w2b = 1 / 100
         self.b2w = 100
         self.timeStep = 1.0 / 60
