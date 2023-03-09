@@ -32,7 +32,7 @@ class Scene:
         self.game_objects = []
         self.groups = {"all_sprites": all_sprites, "drawable": drawable}
         self.rand = random.Random
-        self.user_object: game_object.GameObject
+        self.user_object: game_object.GameObject = None
         enemies = pygame.sprite.Group()
         player = pygame.sprite.Group()
         player_shot = pygame.sprite.Group()
@@ -76,7 +76,8 @@ class Scene:
             **kwargs: A dictionary of named arguments to be used as initialization parameters.
         """
         self.game_objects.append(game_object.Updater(self))
-        self.game_objects.append(game_object.Player(self))
+        self.user_object = game_object.Player(self)
+        self.game_objects.append(self.user_object)
         for rows in range(100, 550, 75):
             for cols in range(400, 850, 75):
                 self.game_objects.append(game_object.Enemy(self, cols, rows))
