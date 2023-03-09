@@ -87,10 +87,11 @@ class Projectile(game_object.GameObject):
         self.body = self.scene.world.CreateDynamicBody(position=(xPos, yPos))
         shape = b2CircleShape(radius= .05)
         # include an if statement here that changes these based on projectile type
-        fixDef = b2FixtureDef(shape=shape, friction=0.3, restitution=.5, density=.5)
+        fixDef = b2FixtureDef(shape=shape, friction=0.3, restitution=.5, density=.25)
+        box = self.body.CreateFixture(fixDef)
         self.dirty = 2
-        d = .05 * self.scene.b2w * 2
-        self.image = pygame.Surface((d,d), pygame.SCRALPHA, 32)
+        diameter = .05 * self.scene.b2w * 2
+        self.image = pygame.Surface((diameter,diameter), pygame.SCRALPHA, 32)
         self.image.convert_alpha()
         self.rect = self.image.get_rect()
         pygame.draw.circle(self.image, (225, 225, 225), self.rect.center, .05 * self.scene.b2w)
@@ -104,11 +105,11 @@ class Projectile(game_object.GameObject):
         collided = pygame.sprite.spritecollide(self, self.scene.groups.get('drawable'), False)
         # i want this to be logic that makes the bullet disappear when it collides with an enemy or goes off-screen
         #don't think it actually does that though, i just put random values based on my estimate for screen size
-        if len(collided) > 1 or self.body.positon[1] > 300:
+        if len(collided) > 0 or self.body.positon[1] > 300:
             self.kill()
             #remove from game objects
         elif self.proType == 0:
             # might only do this once, have a boolean that keeps track
             #im hoping this just makes the bullet go straight at some speed?
-            self.body.ApplyLinearImpulseToCenter((0, 5), True)
+            self.body.ApplyLinearImpulse(b2Vec2(0, 5), self.body.position, True)
 
