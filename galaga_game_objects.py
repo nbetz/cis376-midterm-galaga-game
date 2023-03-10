@@ -1,6 +1,8 @@
 import pygame
 from Box2D import b2CircleShape, b2FixtureDef, b2Vec2
 
+import engine
+import galaga_scene
 import game_object
 import scene
 
@@ -66,7 +68,6 @@ class Enemy(game_object.GameObject):
         self.dirty = 0
 
     def update(self, **kwargs):
-        print(self.y)
         if self.flag == 30:
             self.flag = self.flag + 1
             self.y = self.y + 10
@@ -112,4 +113,36 @@ class Projectile(game_object.GameObject):
             # might only do this once, have a boolean that keeps track
             #im hoping this just makes the bullet go straight at some speed?
             self.body.ApplyLinearImpulse(b2Vec2(0, 5), self.body.position, True)
+
+class TitleObject(game_object.GameObject):
+    def __init__(self, in_scene: "TitleScreen", e):
+        super().__init__(225, 90, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'))
+        self.image = pygame.image.load\
+            ('assets\Galaga-Logo-PNG-File.png').convert_alpha()
+        self.image.set_alpha(255)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.dirty = 0
+        self.e = e
+
+    def update(self, **kwargs):
+        if kwargs.get('type') == 'keydown':
+            event = kwargs.get('key')
+            if event == pygame.K_SPACE:
+                game_scene = galaga_scene.GalagaScene(engine)
+                engine.Engine.add_scene(self.e, game_scene)
+                engine.Engine.set_active_scene(self.e, game_scene)
+
+class TitleText(game_object.GameObject):
+    def __init__(self, in_scene: "TitleScreen", text, x, y):
+        super().__init__(x, y, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'))
+        self.font = pygame.font.Font('freesansbold.ttf', 20)
+        self.image = self.font.render(text , True, (255, 255, 255))
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.dirty = 0
+
+
 

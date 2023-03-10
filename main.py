@@ -11,9 +11,9 @@ if __name__ == '__main__':
                         help='Specify the fps for the game')
     parser.add_argument('--tile_size', nargs='?', type=int, default=30,
                         help='Specify the size of the tiles for the game')
-    parser.add_argument('--width', nargs='?', type=int, default=980,
+    parser.add_argument('--width', nargs='?', type=int, default=1080,
                         help='Specify the width of the screen')
-    parser.add_argument('--height', nargs='?', type=int, default=600,
+    parser.add_argument('--height', nargs='?', type=int, default=720,
                         help='Specify the height of the screen')
     args = parser.parse_args()
 
@@ -25,9 +25,11 @@ if __name__ == '__main__':
 
     # create the engine and scene
     e = engine.Engine(game_fps=fps, screen_width=width, screen_height=height)
-    game_scene = galaga_scene.GalagaScene()
+    #game_scene = galaga_scene.GalagaScene()
+    title_scene = galaga_scene.TitleScreen(e)
 
     # set the active scene to the game_scene we created, and start the engine loop
-    e.add_scene(game_scene)
-    e.set_active_scene(game_scene)
+    #e.add_scene(game_scene)
+    e.add_scene(title_scene)
+    e.set_active_scene(title_scene)
     e.loop()

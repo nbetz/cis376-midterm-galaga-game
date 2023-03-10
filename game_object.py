@@ -56,6 +56,7 @@ class Player(GameObject):
         d = .25 * self.scene.b2w * 2
         self.image = pygame.image.load("assets/Ship5.png")
         self.image.convert_alpha()
+        # TODO maybe use image center?
         self.rect = self.image.get_rect()
         self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
         self.dirty = 0

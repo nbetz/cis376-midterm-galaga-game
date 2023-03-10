@@ -6,7 +6,7 @@ import scene
 
 
 class GalagaScene(scene.Scene):
-    def __init__(self):
+    def __init__(self, engine):
         super().__init__()
         enemies = pygame.sprite.Group()
         player = pygame.sprite.Group()
@@ -23,14 +23,32 @@ class GalagaScene(scene.Scene):
 
 
 
-    def initial_scene(self):
-        self.game_objects.append(galaga_game_objects.Updater(self))
-        self.game_objects.append(galaga_game_objects.Player(self))
-        for rows in range(100, 550, 75):
-            for cols in range(400, 850, 75):
-                self.game_objects.append(galaga_game_objects.Enemy(self, cols, rows))
+class TitleScreen(scene.Scene):
+    def __init__(self, engine):
+        super().__init__()
+        self.game_objects.append(galaga_game_objects.TitleObject(self, engine))
+        self.game_objects.append(galaga_game_objects.TitleText(self, 'How To play:', 475, 400))
+        self.game_objects.append(galaga_game_objects.TitleText(self, 'You are commanding a ship and are being attacked by enemy ships.', 225, 475))
+        self.game_objects.append(galaga_game_objects.TitleText(self, 'Press the space bar to fire your cannons and the ', 225, 500))
+        self.game_objects.append(galaga_game_objects.TitleText(self, 'arrow keys to dodge incoming shots.', 225, 525))
+        self.game_objects.append(galaga_game_objects.TitleText(self, 'Good luck captain!', 450, 600))
+        self.game_objects.append(galaga_game_objects.TitleText(self, 'Press Space to begin!', 850, 680))
 
-    def check_win(self) -> bool:
-        return False
+    def initial_grid(self, **kwargs):
+        pass
+
+
+
+
+
+
+
+
+    # 'How to play: \n '
+    # 'You are commanding a ship and are being attacked by enemy ships. \n'
+    # 'Press the space bar to fire your cannons and the '
+    # 'arrow keys to dodge incoming shots. \n'
+    # 'Good luck captain!
+
 
 
