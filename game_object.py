@@ -45,6 +45,9 @@ class Updater(GameObject):
 
 
 class Player(GameObject):
+    pygame.mixer.init()
+    bulletSound = pygame.mixer.Sound("assets/fire.wav")
+
     def __init__(self, in_scene: "Scene"):
         super().__init__(100, 400, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'),
                          in_scene.groups.get('player'))
@@ -71,6 +74,7 @@ class Player(GameObject):
                     projectile = Projectile(self.scene, (self.body.position[0] * self.scene.b2w) + 50,
                                             600 - (self.body.position[1] * self.scene.b2w), 0)
                     self.scene.game_objects.append(projectile)
+                    pygame.mixer.Sound.play(self.bulletSound)
             elif event == pygame.K_w or event == pygame.K_UP:
                 self.body.ApplyForce(b2Vec2(0, 3), self.body.position, True)
             elif event == pygame.K_s or event == pygame.K_DOWN:
@@ -133,10 +137,11 @@ class Enemy(GameObject):
 
 
 class Projectile(GameObject):
+    explosionSound = pygame.mixer.Sound("assets/explosion.wav")
+
     # x pos and y pos can be player/enemy position or some value based on the positon
     # type will be a number that defines what type of projectile it needs to be
     def __init__(self, in_scene: "GalagaScene", xPos: int, yPos: int, projectile_type: int):
-        print("creating")
         if projectile_type == 0:
             super().__init__(xPos, yPos, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'),
                          in_scene.groups.get('player_shot'))
@@ -168,9 +173,6 @@ class Projectile(GameObject):
             self.body.ApplyForce(b2Vec2((player_body_position[0] - self.body.position[0])/10,
                                         (player_body_position[1] - self.body.position[1])/10), self.body.position, True)
 
-        # i'm thinking type could just be an integer, where 0 represents a player projectile and then other numbers
-        # represent the other types of projectiles
-
     def update(self, **kwargs):
         self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
         if self.type == 0:
@@ -180,14 +182,12 @@ class Projectile(GameObject):
             collided = pygame.sprite.spritecollide(self, self.scene.groups.get('player'), False)
             collided_w_projectile = pygame.sprite.spritecollide(self, self.scene.groups.get('player_shot'), False)
 
-
-        # i want this to be logic that makes the bullet disappear when it collides with an enemy or goes off-screen
-        # don't think it actually does that though, i just put random values based on my estimate for screen size
         if len(collided) > 0 or len(collided_w_projectile) > 0 or self.body.position[0] > 9 or self.body.position[0] < 0:
             self.kill()
             if len(collided) > 0:
                 collided[0].kill()
                 if self.type > 0:
+                    pygame.mixer.Sound.play(self.explosionSound)
                     print('Game Over!')
                     exit()
             if len(collided_w_projectile) > 0:
@@ -197,9 +197,5 @@ class Projectile(GameObject):
             player_body_position = self.scene.user_object.body.position
             self.body.ApplyForce(b2Vec2((player_body_position[0] - self.body.position[0])/10 + 0.1,
                                         (player_body_position[1] - self.body.position[1])/10), self.body.position, True)
-
-            # remove from game objects
-        # else:
-        #     # might only do this once, have a boolean that keeps track
-        #     # im hoping this just makes the bullet go straight at some speed?
         self.dirty = 0
+
