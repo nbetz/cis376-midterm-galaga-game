@@ -158,7 +158,10 @@ class Projectile(GameObject):
         # self.image = pygame.image.load("assets/shot.png")
         # self.image.convert_alpha()
         # self.rect = self.image.get_rect()
-        self.image = pygame.image.load("assets/shot.png")
+        if projectile_type == 0:
+            self.image = pygame.image.load("assets/shot.png")
+        else:
+            self.image = pygame.image.load("assets/shot-flip.png")
         self.image.convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w

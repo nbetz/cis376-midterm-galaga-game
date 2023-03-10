@@ -41,9 +41,9 @@ class Player(game_object.GameObject):
                     print('pew pew')
                     # this is where I was trying to add the object to the scene
             elif event == pygame.K_w or event == pygame.K_UP:
-                self.body.ApplyForce(b2Vec2(0, 1), self.body.position, True)
+                self.body.ApplyForce(b2Vec2(0, 5), self.body.position, True)
             elif event == pygame.K_s or event == pygame.K_DOWN:
-                self.body.ApplyForce(b2Vec2(0, -1), self.body.position, True)
+                self.body.ApplyForce(b2Vec2(0, -5), self.body.position, True)
             self.dirty = 0
 
         if kwargs.get('type') == 'keyup':
