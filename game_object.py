@@ -5,7 +5,7 @@ Provides basic functions for creating GameObjects for a game.
 import random
 
 import pygame
-from Box2D import b2Vec2, b2FixtureDef, b2CircleShape
+from Box2D import b2Vec2, b2FixtureDef, b2CircleShape, b2PolygonShape
 
 from pygame.sprite import AbstractGroup
 
@@ -46,21 +46,18 @@ class Updater(GameObject):
 
 class Player(GameObject):
     def __init__(self, in_scene: "Scene"):
-        super().__init__(50, 400, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'),
+        super().__init__(100, 400, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'),
                          in_scene.groups.get('player'))
-        # TODO change box2d shape and position
-        self.body = self.scene.world.CreateDynamicBody(position=(0.5, 4))
-        shape = b2CircleShape(radius=.25)
+        self.body = self.scene.world.CreateDynamicBody(position=(1, 4))
+        shape = b2PolygonShape(box=(.5, .3))
         fixDef = b2FixtureDef(shape=shape, friction=0.3, restitution=.5, density=.5)
         box = self.body.CreateFixture(fixDef)
         self.dirty = 2
         d = .25 * self.scene.b2w * 2
         self.image = pygame.image.load("assets/Ship5.png")
         self.image.convert_alpha()
-        # TODO maybe use image center?
         self.rect = self.image.get_rect()
-        # pygame.draw.circle(self.image, (0, 101, 164), self.rect.center, .25 * self.scene.b2w)
-
+        self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
         self.dirty = 0
 
     def update(self, **kwargs):
@@ -90,15 +87,30 @@ class Player(GameObject):
 
 
 class Enemy(GameObject):
-    def __init__(self, in_scene: "GalagaScene", x, y):
+    def __init__(self, in_scene: "GalagaScene", x, y, enemy_type: int):
         super().__init__(x, y, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'),
                          in_scene.groups.get('enemies'))
-        self.image = pygame.image.load("assets/Ship1.png")
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
         self.flag = 0
         self.dirty = 0
+        if enemy_type <= 3:
+            self.image = pygame.image.load("assets/Ship1.png")
+            self.rect = self.image.get_rect()
+            self.rect.x = self.x
+            self.rect.y = self.y
+            self.type = 1
+
+        elif enemy_type == 4:
+            self.image = pygame.image.load("assets/Ship2.png")
+            self.rect = self.image.get_rect()
+            self.rect.x = self.x
+            self.rect.y = self.y
+            self.type = 2
+        else:
+            self.image = pygame.image.load("assets/Ship3.png")
+            self.rect = self.image.get_rect()
+            self.rect.x = self.x
+            self.rect.y = self.y
+            self.type = 3
 
     def update(self, **kwargs):
         # print(self.y)
@@ -114,26 +126,24 @@ class Enemy(GameObject):
             self.flag = 1
         else:
             self.flag = self.flag + 1
-            if random.randint(0, 50000) < 5:
+            if random.randint(0, 10000) < 5:
                 projectile = Projectile(self.scene, (self.x - 50),
-                                        self.y, 1)
-            elif 5 < random.randint(0, 50000) < 10:
-                projectile = Projectile(self.scene, (self.x - 50),
-                                        self.y, 2)
-            elif 10 < random.randint(0, 50000) < 15:
-                projectile = Projectile(self.scene, (self.x - 50),
-                                        self.y, 3)
+                                        self.y, self.type)
 
 
 class Projectile(GameObject):
     # x pos and y pos can be player/enemy position or some value based on the positon
     # type will be a number that defines what type of projectile it needs to be
-    def __init__(self, in_scene: "GalagaScene", xPos: int, yPos: int, type: int):
+    def __init__(self, in_scene: "GalagaScene", xPos: int, yPos: int, projectile_type: int):
         print("creating")
-        super().__init__(xPos, yPos, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'),
+        if projectile_type == 0:
+            super().__init__(xPos, yPos, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'),
                          in_scene.groups.get('player_shot'))
+        else:
+            super().__init__(xPos, yPos, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'),
+                             in_scene.groups.get('enemy_shot'))
         self.body = self.scene.world.CreateDynamicBody(position=(xPos * self.scene.w2b, (600 - yPos) * self.scene.w2b))
-        shape = b2CircleShape(radius=.05)
+        shape= b2PolygonShape(box=(.20, .04))
         # include an if statement here that changes these based on projectile type
         fixDef = b2FixtureDef(shape=shape, friction=0.3, restitution=.5, density=.25)
         box = self.body.CreateFixture(fixDef)
@@ -145,13 +155,14 @@ class Projectile(GameObject):
         self.image = pygame.image.load("assets/shot.png")
         self.image.convert_alpha()
         self.rect = self.image.get_rect()
+        self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
         self.dirty = 0
-        self.type = type
-        if type == 0:
+        self.type = projectile_type
+        if projectile_type == 0:
             self.body.ApplyForce(b2Vec2(1, 0), self.body.position, True)
-        elif type == 1:
+        elif projectile_type == 1:
             self.body.ApplyForce(b2Vec2(-1, 0), self.body.position, True)
-        elif type == 2 or type == 3:
+        elif projectile_type == 2 or projectile_type == 3:
             player_body_position = self.scene.user_object.body.position
             self.body.ApplyForce(b2Vec2((player_body_position[0] - self.body.position[0])/10,
                                         (player_body_position[1] - self.body.position[1])/10), self.body.position, True)
@@ -163,22 +174,27 @@ class Projectile(GameObject):
         self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
         if self.type == 0:
             collided = pygame.sprite.spritecollide(self, self.scene.groups.get('enemies'), False)
+            collided_w_projectile = pygame.sprite.spritecollide(self, self.scene.groups.get('enemy_shot'), False)
         else:
             collided = pygame.sprite.spritecollide(self, self.scene.groups.get('player'), False)
+            collided_w_projectile = pygame.sprite.spritecollide(self, self.scene.groups.get('player_shot'), False)
+
 
         # i want this to be logic that makes the bullet disappear when it collides with an enemy or goes off-screen
         # don't think it actually does that though, i just put random values based on my estimate for screen size
-        if len(collided) > 0 or self.body.position[0] > 9 or self.body.position[0] < 0:
+        if len(collided) > 0 or len(collided_w_projectile) > 0 or self.body.position[0] > 9 or self.body.position[0] < 0:
             self.kill()
             if len(collided) > 0:
                 collided[0].kill()
-            if self.type > 0:
-                print('Game Over!')
-                exit()
+                if self.type > 0:
+                    print('Game Over!')
+                    exit()
+            if len(collided_w_projectile) > 0:
+                collided_w_projectile[0].kill()
         if self.type == 3:
             self.body.linearVelocity = (0, 0)
             player_body_position = self.scene.user_object.body.position
-            self.body.ApplyForce(b2Vec2((player_body_position[0] - self.body.position[0])/10,
+            self.body.ApplyForce(b2Vec2((player_body_position[0] - self.body.position[0])/10 + 0.1,
                                         (player_body_position[1] - self.body.position[1])/10), self.body.position, True)
 
             # remove from game objects

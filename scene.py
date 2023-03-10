@@ -79,5 +79,7 @@ class Scene:
         self.user_object = game_object.Player(self)
         self.game_objects.append(self.user_object)
         for rows in range(100, 550, 75):
+            col_count = 0
             for cols in range(400, 850, 75):
-                self.game_objects.append(game_object.Enemy(self, cols, rows))
+                col_count += 1
+                self.game_objects.append(game_object.Enemy(self, cols, rows, col_count))
