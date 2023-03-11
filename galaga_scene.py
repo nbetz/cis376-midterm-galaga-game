@@ -6,13 +6,13 @@ import scene
 
 
 class GalagaScene(scene.Scene):
-    def __init__(self, engine):
+    def __init__(self, eng):
         super().__init__()
         enemies = pygame.sprite.Group()
         player = pygame.sprite.Group()
         player_shot = pygame.sprite.Group()
         enemy_shot = pygame.sprite.Group()
-        self.e = engine
+        self.e = eng
 
         self.groups.update({"enemies": enemies, "player": player, "player_shot": player_shot, "enemy_shot": enemy_shot})
         self.w2b = 1 / 100
@@ -25,9 +25,9 @@ class GalagaScene(scene.Scene):
 
 
 class TitleScreen(scene.Scene):
-    def __init__(self, engine):
+    def __init__(self, eng):
         super().__init__()
-        self.game_objects.append(galaga_game_objects.TitleObject(self, engine))
+        self.game_objects.append(galaga_game_objects.TitleObject(self, eng))
         self.game_objects.append(galaga_game_objects.TitleText(self, 'How To play:', 475, 400))
         self.game_objects.append(galaga_game_objects.TitleText(self, 'You are commanding a ship and are being attacked by enemy ships.', 225, 475))
         self.game_objects.append(galaga_game_objects.TitleText(self, 'Press the space bar to fire your cannons and the ', 225, 500))

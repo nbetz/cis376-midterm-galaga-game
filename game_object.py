@@ -166,7 +166,8 @@ class Projectile(GameObject):
             self.image = pygame.image.load("assets/shot.png")
         else:
             # CHANGE
-            self.image = pygame.image.load("assets/shot-flip.png")
+            self.image = pygame.image.load("assets/shot.png")
+            #self.image = pygame.image.load("assets/shot-flip.png")
         self.image.convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
@@ -200,8 +201,9 @@ class Projectile(GameObject):
                     # for sprite in self.scene.groups.get('all_sprites').sprites():
                     #     sprite.kill()
                     game_scene = scene.EndScene(engine)
-                    engine.Engine.add_scene(self.scene.e.Engine, game_scene)
-                    engine.Engine.set_active_scene(self.scene.e.Engine, game_scene)
+                    self.scene.e.add_scene(game_scene)
+                    self.scene.e.set_active_scene(game_scene)
+                    #
                     print('Game Over!')
                     #exit()
             if len(collided_w_projectile) > 0:
