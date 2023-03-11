@@ -12,6 +12,7 @@ class GalagaScene(scene.Scene):
         player = pygame.sprite.Group()
         player_shot = pygame.sprite.Group()
         enemy_shot = pygame.sprite.Group()
+        self.e = engine
 
         self.groups.update({"enemies": enemies, "player": player, "player_shot": player_shot, "enemy_shot": enemy_shot})
         self.w2b = 1 / 100
@@ -36,11 +37,6 @@ class TitleScreen(scene.Scene):
 
     def initial_grid(self, **kwargs):
         pass
-
-
-
-
-
 
 
 
