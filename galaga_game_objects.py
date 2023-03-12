@@ -117,8 +117,9 @@ class Projectile(game_object.GameObject):
 class TitleObject(game_object.GameObject):
     def __init__(self, in_scene: "TitleScreen", e):
         super().__init__(225, 90, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'))
-        self.image = pygame.image.load\
-            ('assets\Galaga-Logo-PNG-File.png').convert_alpha()
+        # self.image = pygame.image.load\
+        #     ('assets\Galaga-Logo-PNG-File.png').convert_alpha()
+        self.image = pygame.image.load('assets\Ship6.png').convert_alpha()
         self.image.set_alpha(255)
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -130,7 +131,7 @@ class TitleObject(game_object.GameObject):
         if kwargs.get('type') == 'keydown':
             event = kwargs.get('key')
             if event == pygame.K_SPACE:
-                game_scene = galaga_scene.GalagaScene(engine)
+                game_scene = galaga_scene.GalagaScene(self.e)
                 engine.Engine.add_scene(self.e, game_scene)
                 engine.Engine.set_active_scene(self.e, game_scene)
 

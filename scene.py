@@ -26,6 +26,7 @@ class Scene:
     user_object: GameObject of the player
     tile_size: int representing how large of a square each sprite should be.
     """
+
     def __init__(self):
         all_sprites = pygame.sprite.Group()
         drawable = pygame.sprite.Group()
@@ -38,7 +39,8 @@ class Scene:
         player_shot = pygame.sprite.Group()
         enemy_shot = pygame.sprite.Group()
         projectiles = pygame.sprite.Group()
-        self.groups.update({"enemies": enemies, "player": player, "player_shot": player_shot, "enemy_shot": enemy_shot, "projectiles":projectiles})
+        self.groups.update({"enemies": enemies, "player": player, "player_shot": player_shot, "enemy_shot": enemy_shot,
+                            "projectiles": projectiles})
         self.w2b = 1 / 100
         self.b2w = 100
         self.timeStep = 1.0 / 60
@@ -83,3 +85,15 @@ class Scene:
             for cols in range(400, 850, 75):
                 col_count += 1
                 self.game_objects.append(game_object.Enemy(self, cols, rows, col_count))
+
+
+class EndScene(Scene):
+    def __init__(self, engine):
+        super().__init__()
+        self.game_objects.append(game_object.GameOverObject(self, engine))
+        self.game_objects.append(game_object.EndText(self, "Press Space Bar to play again", 400, 400))
+        self.game_objects.append(game_object.EndText(self, "Press Escape key to quit", 420, 500))
+
+
+    def initial_grid(self, **kwargs):
+        pass

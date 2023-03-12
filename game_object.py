@@ -6,8 +6,12 @@ import random
 
 import pygame
 from Box2D import b2Vec2, b2FixtureDef, b2CircleShape, b2PolygonShape
+import scene
+import engine
 
 from pygame.sprite import AbstractGroup
+
+
 
 
 class GameObject(pygame.sprite.DirtySprite):
@@ -161,7 +165,9 @@ class Projectile(GameObject):
         if projectile_type == 0:
             self.image = pygame.image.load("assets/shot.png")
         else:
-            self.image = pygame.image.load("assets/shot-flip.png")
+            # CHANGE
+            self.image = pygame.image.load("assets/shot.png")
+            #self.image = pygame.image.load("assets/shot-flip.png")
         self.image.convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
@@ -191,8 +197,15 @@ class Projectile(GameObject):
                 collided[0].kill()
                 if self.type > 0:
                     pygame.mixer.Sound.play(self.explosionSound)
+                    # this is where i did eveything for setting a new scene
+                    # for sprite in self.scene.groups.get('all_sprites').sprites():
+                    #     sprite.kill()
+                    game_scene = scene.EndScene(engine)
+                    self.scene.e.add_scene(game_scene)
+                    self.scene.e.set_active_scene(game_scene)
+                    #
                     print('Game Over!')
-                    exit()
+                    #exit()
             if len(collided_w_projectile) > 0:
                 collided_w_projectile[0].kill()
         if self.type == 3:
@@ -201,4 +214,39 @@ class Projectile(GameObject):
             self.body.ApplyForce(b2Vec2((player_body_position[0] - self.body.position[0])/10 + 0.1,
                                         (player_body_position[1] - self.body.position[1])/10), self.body.position, True)
         self.dirty = 0
+
+class GameOverObject(GameObject):
+    def __init__(self, in_scene: "EndScene", e):
+        super().__init__(340, 90, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'))
+        self.image = pygame.image.load \
+            ('assets\game_over1.png').convert_alpha()
+        self.image.set_alpha(255)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.dirty = 0
+        self.e = e
+
+    def update(self, **kwargs):
+        if kwargs.get('type') == 'keydown':
+            event = kwargs.get('key')
+            #i want to restart the game if you win
+            # if event == pygame.K_SPACE:
+            #     game_scene = galaga_scene.GalagaScene(engine)
+            #     engine.Engine.add_scene(self.e, game_scene)
+            #     engine.Engine.set_active_scene(self.e, game_scene)
+            if event == pygame.K_ESCAPE:
+                exit()
+
+
+class EndText(GameObject):
+    def __init__(self, in_scene: "EndScene", text, x, y):
+        super().__init__(x, y, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'))
+        self.font = pygame.font.Font('freesansbold.ttf', 20)
+        self.image = self.font.render(text, True, (255, 255, 255))
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.dirty = 0
+
 
