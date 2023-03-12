@@ -29,8 +29,8 @@ class GalagaScene(scene.Scene):
     def check_win(self):
         if not self.groups.get("enemies"):
             level_two = LevelTwo(self.e)
-            engine.Engine.add_scene(self.e, level_two)
-            engine.Engine.set_active_scene(self.e, level_two)
+            self.e.add_scene(level_two)
+            self.e.set_active_scene(level_two)
 
 
 class LevelTwo(scene.Scene):
@@ -50,7 +50,7 @@ class LevelTwo(scene.Scene):
         self.pos_iters = 2
         self.world = b2World((0, 0), doSleep=False)
         self.score = 0
-        self.e = engine
+        self.e = eng
         self.game_objects.append(galaga_game_objects.TitleText(self, 'Score: ' + self.score.__str__(), 25, 25))
 
     def initial_grid(self, **kwargs):
@@ -66,8 +66,8 @@ class LevelTwo(scene.Scene):
     def check_win(self):
         if not self.groups.get("enemies"):
             level_three = LevelThree(self.e)
-            engine.Engine.add_scene(self.e, level_three)
-            engine.Engine.set_active_scene(self.e, level_three)
+            self.e.add_scene(level_three)
+            self.e.set_active_scene(level_three)
 
 
 class LevelThree(LevelTwo):
