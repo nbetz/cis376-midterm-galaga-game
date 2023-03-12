@@ -84,7 +84,7 @@ class Scene:
             col_count = 0
             for cols in range(400, 850, 75):
                 col_count += 1
-                self.game_objects.append(game_object.Enemy(self, cols, rows, col_count))
+                self.game_objects.append(game_object.Enemy(self, cols, rows, 1))
 
 
 class EndScene(Scene):

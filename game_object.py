@@ -80,9 +80,9 @@ class Player(GameObject):
                     self.scene.game_objects.append(projectile)
                     pygame.mixer.Sound.play(self.bulletSound)
             elif event == pygame.K_w or event == pygame.K_UP:
-                self.body.ApplyForce(b2Vec2(0, 3), self.body.position, True)
+                self.body.ApplyForce(b2Vec2(0, 7), self.body.position, True)
             elif event == pygame.K_s or event == pygame.K_DOWN:
-                self.body.ApplyForce(b2Vec2(0, -3), self.body.position, True)
+                self.body.ApplyForce(b2Vec2(0, -7), self.body.position, True)
             self.dirty = 0
 
         if kwargs.get('type') == 'keyup':
@@ -153,7 +153,7 @@ class Projectile(GameObject):
             super().__init__(xPos, yPos, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'),
                              in_scene.groups.get('enemy_shot'))
         self.body = self.scene.world.CreateDynamicBody(position=(xPos * self.scene.w2b, (600 - yPos) * self.scene.w2b))
-        shape= b2PolygonShape(box=(.20, .04))
+        shape = b2PolygonShape(box=(.20, .04))
         # include an if statement here that changes these based on projectile type
         fixDef = b2FixtureDef(shape=shape, friction=0.3, restitution=.5, density=.25)
         box = self.body.CreateFixture(fixDef)
@@ -166,7 +166,7 @@ class Projectile(GameObject):
             self.image = pygame.image.load("assets/shot.png")
         else:
             # CHANGE
-            self.image = pygame.image.load("assets/shot.png")
+            self.image = pygame.image.load("assets/shot-flip.png")
             #self.image = pygame.image.load("assets/shot-flip.png")
         self.image.convert_alpha()
         self.rect = self.image.get_rect()
@@ -194,6 +194,7 @@ class Projectile(GameObject):
         if len(collided) > 0 or len(collided_w_projectile) > 0 or self.body.position[0] > 9 or self.body.position[0] < 0:
             self.kill()
             if len(collided) > 0:
+                self.scene.score = self.scene.score + 100
                 collided[0].kill()
                 if self.type > 0:
                     pygame.mixer.Sound.play(self.explosionSound)
