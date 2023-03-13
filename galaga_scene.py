@@ -23,8 +23,13 @@ class GalagaScene(scene.Scene):
         self.pos_iters = 2
         self.world = b2World((0, 0), doSleep=False)
         self.score = 0
+        self.time = 0
         self.e = eng
         self.game_objects.append(galaga_game_objects.TitleText(self, 'Score: ' + self.score.__str__(), 25, 25))
+        self.game_objects.append(galaga_game_objects.TitleText(self, 'Time: ' + self.time.__str__(), 980, 25))
+        self.game_objects.append(galaga_game_objects.Upper(self))
+        self.game_objects.append(galaga_game_objects.Lower(self))
+
 
     def check_win(self):
         if not self.groups.get("enemies"):
@@ -50,8 +55,12 @@ class LevelTwo(scene.Scene):
         self.pos_iters = 2
         self.world = b2World((0, 0), doSleep=False)
         self.score = 0
+        self.time = 0
         self.e = eng
         self.game_objects.append(galaga_game_objects.TitleText(self, 'Score: ' + self.score.__str__(), 25, 25))
+        self.game_objects.append(galaga_game_objects.TitleText(self, 'Time: ' + self.time.__str__(), 980, 25))
+        self.game_objects.append(galaga_game_objects.Upper(self))
+        self.game_objects.append(galaga_game_objects.Lower(self))
 
     def initial_grid(self, **kwargs):
         self.game_objects.append(game_object.Updater(self))
@@ -97,8 +106,7 @@ class TitleScreen(scene.Scene):
         self.game_objects.append(galaga_game_objects.TitleText(self, 'You are commanding a ship and are being attacked by enemy ships.', 225, 475))
         self.game_objects.append(galaga_game_objects.TitleText(self, 'Press the space bar to fire your cannons and the ', 225, 500))
         self.game_objects.append(galaga_game_objects.TitleText(self, 'arrow keys to dodge incoming shots.', 225, 525))
-        self.game_objects.append(galaga_game_objects.TitleText(self, 'Good luck captain!', 450, 600))
-        self.game_objects.append(galaga_game_objects.TitleText(self, 'Press Space to begin!', 850, 680))
+        self.game_objects.append(galaga_game_objects.TitleText(self, 'Press Space to begin!', 850, 570))
 
     def initial_grid(self, **kwargs):
         pass

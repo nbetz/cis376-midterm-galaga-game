@@ -38,7 +38,6 @@ class GameObject(pygame.sprite.DirtySprite):
         self.last_y = y
         self.scene = in_scene
 
-
 class Updater(GameObject):
     def __init__(self, in_scene: "Scene"):
         super().__init__(0, 0, in_scene, in_scene.groups.get('all_sprites'))
@@ -57,7 +56,7 @@ class Player(GameObject):
                          in_scene.groups.get('player'))
         self.body = self.scene.world.CreateDynamicBody(position=(0.75, 4))
         shape = b2PolygonShape(box=(.5, .3))
-        fixDef = b2FixtureDef(shape=shape, friction=0.3, restitution=.5, density=.5)
+        fixDef = b2FixtureDef(shape=shape, friction=1, restitution=0, density=.5)
         box = self.body.CreateFixture(fixDef)
         self.dirty = 2
         d = .25 * self.scene.b2w * 2
@@ -80,12 +79,18 @@ class Player(GameObject):
                     self.scene.game_objects.append(projectile)
                     pygame.mixer.Sound.play(self.bulletSound)
             elif event == pygame.K_w or event == pygame.K_UP:
-                self.body.linearVelocity = (0, 0)
-                self.body.ApplyLinearImpulse(b2Vec2(0, 0.3), self.body.position, True)
+                if (self.rect.y - 15) < 0:
+                    self.body.linearVelocity = (0, 0)
+                else:
+                    self.body.linearVelocity = (0, 0)
+                    self.body.ApplyLinearImpulse(b2Vec2(0, 0.3), self.body.position, True)
                 #self.body.ApplyForce(b2Vec2(0, 3), self.body.position, True)
             elif event == pygame.K_s or event == pygame.K_DOWN:
-                self.body.linearVelocity = (0, 0)
-                self.body.ApplyLinearImpulse(b2Vec2(0, -0.3), self.body.position, True)
+                if (self.rect.y + 15) > 600:
+                    self.body.linearVelocity = (0, 0)
+                else:
+                    self.body.linearVelocity = (0, 0)
+                    self.body.ApplyLinearImpulse(b2Vec2(0, -0.3), self.body.position, True)
                 #self.body.ApplyForce(b2Vec2(0, -3), self.body.position, True)
             self.dirty = 0
 
@@ -239,10 +244,10 @@ class GameOverObject(GameObject):
         if kwargs.get('type') == 'keydown':
             event = kwargs.get('key')
             #i want to restart the game if you win
-            # if event == pygame.K_SPACE:
-            #     game_scene = galaga_scene.GalagaScene(engine)
-            #     engine.Engine.add_scene(self.e, game_scene)
-            #     engine.Engine.set_active_scene(self.e, game_scene)
+            #if event == pygame.K_SPACE:
+                #game_scene = galaga_scene.GalagaScene(self.e)
+                #engine.Engine.add_scene(self.e, game_scene)
+                #engine.Engine.set_active_scene(self.e, game_scene)
             if event == pygame.K_ESCAPE:
                 exit()
 

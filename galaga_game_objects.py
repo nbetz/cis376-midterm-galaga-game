@@ -1,10 +1,30 @@
 import pygame
-from Box2D import b2CircleShape, b2FixtureDef, b2Vec2
+from Box2D import b2CircleShape, b2FixtureDef, b2Vec2, b2PolygonShape
 
 import engine
 import galaga_scene
 import game_object
 import scene
+
+#THESE ARE THE ONES
+class Upper(game_object.GameObject):
+    def __init__(self, in_scene: "Scene"):
+        super().__init__(25, 25, in_scene, in_scene.groups.get('all_sprites'))
+        self.body = self.scene.world.CreateStaticBody(position=(0.5, 5.6))
+        shape = b2PolygonShape(box=(10, .3))
+        fixDef = b2FixtureDef(shape=shape, friction=1, restitution=0, density=.5)
+        box = self.body.CreateFixture(fixDef)
+        self.dirty = 2
+
+class Lower(game_object.GameObject):
+    def __init__(self, in_scene: "Scene"):
+        super().__init__(25, 545, in_scene, in_scene.groups.get('all_sprites'))
+        self.body = self.scene.world.CreateStaticBody(position=(0.5, 0.4))
+        shape = b2PolygonShape(box=(1, .3))
+        fixDef = b2FixtureDef(shape=shape, friction=1, restitution=0, density=.5)
+        box = self.body.CreateFixture(fixDef)
+        self.dirty = 2
+
 
 class Updater(game_object.GameObject):
     def __init__(self, in_scene: "GalagaScene"):
@@ -19,7 +39,7 @@ class Player(game_object.GameObject):
         super().__init__(50, 400, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'), in_scene.groups.get('player'))
         self.body = self.scene.world.CreateDynamicBody(position=(0.5, 4))
         shape = b2CircleShape(radius=.25)
-        fixDef = b2FixtureDef(shape=shape, friction=0.3, restitution=.5, density=.5)
+        fixDef = b2FixtureDef(shape=shape, friction=1, restitution=.5, density=.5)
         box = self.body.CreateFixture(fixDef)
         self.dirty = 2
         d = .25 * self.scene.b2w * 2
