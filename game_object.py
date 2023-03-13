@@ -63,6 +63,7 @@ class Player(GameObject):
         d = .25 * self.scene.b2w * 2
         self.image = pygame.image.load("assets/Ship5.png")
         self.image.convert_alpha()
+        # TODO maybe use image center?
         self.rect = self.image.get_rect()
         self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
         self.dirty = 0
@@ -169,7 +170,7 @@ class Projectile(GameObject):
             self.image = pygame.image.load("assets/shot.png")
         else:
             # CHANGE
-            self.image = pygame.image.load("assets/shot.png")
+            self.image = pygame.image.load("assets/shot-flip.png")
             #self.image = pygame.image.load("assets/shot-flip.png")
         self.image.convert_alpha()
         self.rect = self.image.get_rect()
@@ -197,6 +198,7 @@ class Projectile(GameObject):
         if len(collided) > 0 or len(collided_w_projectile) > 0 or self.body.position[0] > 9 or self.body.position[0] < 0:
             self.kill()
             if len(collided) > 0:
+                self.scene.score = self.scene.score + 100
                 collided[0].kill()
                 if self.type > 0:
                     pygame.mixer.Sound.play(self.explosionSound)

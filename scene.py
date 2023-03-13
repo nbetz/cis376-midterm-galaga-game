@@ -84,13 +84,13 @@ class Scene:
             col_count = 0
             for cols in range(400, 850, 75):
                 col_count += 1
-                self.game_objects.append(game_object.Enemy(self, cols, rows, col_count))
+                self.game_objects.append(game_object.Enemy(self, cols, rows, 1))
 
 
 class EndScene(Scene):
-    def __init__(self, engine):
+    def __init__(self, eng):
         super().__init__()
-        self.game_objects.append(game_object.GameOverObject(self, engine))
+        self.game_objects.append(game_object.GameOverObject(self, eng))
         self.game_objects.append(game_object.EndText(self, "Press Space Bar to play again", 400, 400))
         self.game_objects.append(game_object.EndText(self, "Press Escape key to quit", 420, 500))
 

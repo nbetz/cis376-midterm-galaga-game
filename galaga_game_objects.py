@@ -115,17 +115,17 @@ class Projectile(game_object.GameObject):
             self.body.ApplyLinearImpulse(b2Vec2(0, 5), self.body.position, True)
 
 class TitleObject(game_object.GameObject):
-    def __init__(self, in_scene: "TitleScreen", e):
+    def __init__(self, in_scene: "TitleScreen", eng):
         super().__init__(225, 90, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'))
         # self.image = pygame.image.load\
         #     ('assets\Galaga-Logo-PNG-File.png').convert_alpha()
-        self.image = pygame.image.load('assets\Ship6.png').convert_alpha()
+        self.image = pygame.image.load('assets\Galaga-Logo-PNG-File.png').convert_alpha()
         self.image.set_alpha(255)
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
         self.dirty = 0
-        self.e = e
+        self.e = eng
 
     def update(self, **kwargs):
         if kwargs.get('type') == 'keydown':
