@@ -5,7 +5,7 @@ Provides basic functions for creating GameObjects for a game.
 import random
 
 import pygame
-from Box2D import b2Vec2, b2FixtureDef, b2CircleShape, b2PolygonShape
+from Box2D import b2Vec2, b2FixtureDef, b2PolygonShape
 import scene
 import engine
 
@@ -53,9 +53,9 @@ class Player(GameObject):
     bulletSound = pygame.mixer.Sound("assets/fire.wav")
 
     def __init__(self, in_scene: "Scene"):
-        super().__init__(100, 400, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'),
+        super().__init__(75, 400, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'),
                          in_scene.groups.get('player'))
-        self.body = self.scene.world.CreateDynamicBody(position=(1, 4))
+        self.body = self.scene.world.CreateDynamicBody(position=(0.75, 4))
         shape = b2PolygonShape(box=(.5, .3))
         fixDef = b2FixtureDef(shape=shape, friction=0.3, restitution=.5, density=.5)
         box = self.body.CreateFixture(fixDef)
@@ -63,7 +63,6 @@ class Player(GameObject):
         d = .25 * self.scene.b2w * 2
         self.image = pygame.image.load("assets/Ship5.png")
         self.image.convert_alpha()
-        # TODO maybe use image center?
         self.rect = self.image.get_rect()
         self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
         self.dirty = 0
@@ -75,14 +74,18 @@ class Player(GameObject):
             event = kwargs.get('key')
             if event == pygame.K_SPACE:
                 if len(collided) > 0:
-                    projectile = Projectile(self.scene, (self.body.position[0] * self.scene.b2w) + 50,
+                    projectile = Projectile(self.scene, (self.body.position[0] * self.scene.b2w) + 70,
                                             600 - (self.body.position[1] * self.scene.b2w), 0)
                     self.scene.game_objects.append(projectile)
                     pygame.mixer.Sound.play(self.bulletSound)
             elif event == pygame.K_w or event == pygame.K_UP:
-                self.body.ApplyForce(b2Vec2(0, 3), self.body.position, True)
+                self.body.linearVelocity = (0, 0)
+                self.body.ApplyLinearImpulse(b2Vec2(0, 0.3), self.body.position, True)
+                #self.body.ApplyForce(b2Vec2(0, 3), self.body.position, True)
             elif event == pygame.K_s or event == pygame.K_DOWN:
-                self.body.ApplyForce(b2Vec2(0, -3), self.body.position, True)
+                self.body.linearVelocity = (0, 0)
+                self.body.ApplyLinearImpulse(b2Vec2(0, -0.3), self.body.position, True)
+                #self.body.ApplyForce(b2Vec2(0, -3), self.body.position, True)
             self.dirty = 0
 
         if kwargs.get('type') == 'keyup':
@@ -153,7 +156,7 @@ class Projectile(GameObject):
             super().__init__(xPos, yPos, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'),
                              in_scene.groups.get('enemy_shot'))
         self.body = self.scene.world.CreateDynamicBody(position=(xPos * self.scene.w2b, (600 - yPos) * self.scene.w2b))
-        shape= b2PolygonShape(box=(.20, .04))
+        shape = b2PolygonShape(box=(.15, .03))
         # include an if statement here that changes these based on projectile type
         fixDef = b2FixtureDef(shape=shape, friction=0.3, restitution=.5, density=.25)
         box = self.body.CreateFixture(fixDef)
@@ -211,7 +214,10 @@ class Projectile(GameObject):
         if self.type == 3:
             self.body.linearVelocity = (0, 0)
             player_body_position = self.scene.user_object.body.position
-            self.body.ApplyForce(b2Vec2((player_body_position[0] - self.body.position[0])/10 + 0.1,
+            if (player_body_position[1] - self.body.position[1])/10 > -0.3:
+                self.body.ApplyForce(b2Vec2(-0.3, (player_body_position[1] - self.body.position[1])/10), self.body.position, True)
+            else:
+                self.body.ApplyForce(b2Vec2((player_body_position[0] - self.body.position[0]/10),
                                         (player_body_position[1] - self.body.position[1])/10), self.body.position, True)
         self.dirty = 0
 
