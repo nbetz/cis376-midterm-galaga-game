@@ -11,6 +11,7 @@ Typical usage example:
 
 import pygame
 import scene
+from pygame import mixer
 
 
 class Engine:
@@ -42,6 +43,10 @@ class Engine:
         Engine.screen = pygame.display.set_mode((screen_width, screen_height))
         Engine.clock = pygame.time.Clock()
         Engine.delta_time = 0
+        mixer.init()
+        mixer.music.load('assets/cpu-talk.wav')
+        mixer.music.play(-1)
+
 
     def loop(self):
         """runs the engine's game loop
