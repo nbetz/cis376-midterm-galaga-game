@@ -207,15 +207,10 @@ class Projectile(GameObject):
                 collided[0].kill()
                 if self.type > 0:
                     pygame.mixer.Sound.play(self.explosionSound)
-                    # this is where i did eveything for setting a new scene
-                    # for sprite in self.scene.groups.get('all_sprites').sprites():
-                    #     sprite.kill()
                     game_scene = scene.EndScene(engine)
                     self.scene.e.add_scene(game_scene)
                     self.scene.e.set_active_scene(game_scene)
-                    #
                     print('Game Over!')
-                    #exit()
             if len(collided_w_projectile) > 0:
                 collided_w_projectile[0].kill()
         if self.type == 3:
@@ -261,5 +256,4 @@ class EndText(GameObject):
         self.rect.x = self.x
         self.rect.y = self.y
         self.dirty = 0
-
 

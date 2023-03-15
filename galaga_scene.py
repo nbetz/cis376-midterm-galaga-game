@@ -38,6 +38,7 @@ class GalagaScene(scene.Scene):
             self.e.set_active_scene(level_two)
 
 
+
 class LevelTwo(scene.Scene):
     def __init__(self, eng):
         super().__init__()
@@ -93,7 +94,7 @@ class LevelThree(LevelTwo):
 
     def check_win(self):
         if not self.groups.get("enemies"):
-            go = scene.EndScene(self.e)
+            go = WinScene(self.e)
             engine.Engine.add_scene(self.e, go)
             engine.Engine.set_active_scene(self.e, go)
 
@@ -111,5 +112,26 @@ class TitleScreen(scene.Scene):
     def initial_grid(self, **kwargs):
         pass
 
+#I can't get this to run in the game_objects class, so it is also in scene.py
+# class EndScene(scene.Scene):
+#     def __init__(self, eng):
+#         super().__init__()
+#         self.game_objects.append(galaga_game_objects.GameOverObject(self, eng))
+#         #self.game_objects.append(galaga_game_objects.EndText(self, "Press Space Bar to play again", 400, 400))
+#         self.game_objects.append(galaga_game_objects.EndText(self, "Press Escape key to quit", 420, 500))
+#
+#
+#     def initial_grid(self, **kwargs):
+#         pass
 
+class WinScene(scene.Scene):
 
+    def __init__(self, eng):
+        super().__init__()
+        self.game_objects.append(galaga_game_objects.WinGameObject(self, eng))
+        #self.game_objects.append(galaga_game_objects.EndText(self, "Press Space Bar to play again", 400, 400))
+        #self.game_objects.append(galaga_game_objects.WinText(self, "Congratulations! You have destroyed all the enemy ships.", 420, 400))
+        self.game_objects.append(galaga_game_objects.WinText(self, "Press Escape key to quit", 420, 525))
+
+    def initial_grid(self, **kwargs):
+        pass

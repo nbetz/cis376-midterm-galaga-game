@@ -91,7 +91,7 @@ class EndScene(Scene):
     def __init__(self, eng):
         super().__init__()
         self.game_objects.append(game_object.GameOverObject(self, eng))
-        self.game_objects.append(game_object.EndText(self, "Press Space Bar to play again", 400, 400))
+        #self.game_objects.append(game_object.EndText(self, "Press Space Bar to play again", 400, 400))
         self.game_objects.append(game_object.EndText(self, "Press Escape key to quit", 420, 500))
 
 

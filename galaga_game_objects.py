@@ -59,7 +59,6 @@ class Player(game_object.GameObject):
             if event == pygame.K_SPACE:
                 if len(collided) > 0:
                     print('pew pew')
-                    # this is where I was trying to add the object to the scene
             elif event == pygame.K_w or event == pygame.K_UP:
                 self.body.ApplyForce(b2Vec2(0, 5), self.body.position, True)
             elif event == pygame.K_s or event == pygame.K_DOWN:
@@ -160,6 +159,73 @@ class TitleText(game_object.GameObject):
         super().__init__(x, y, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'))
         self.font = pygame.font.Font('freesansbold.ttf', 20)
         self.image = self.font.render(text , True, (255, 255, 255))
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.dirty = 0
+
+class GameOverObject(game_object.GameObject):
+    def __init__(self, in_scene: "EndScene", e):
+        super().__init__(340, 90, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'))
+        self.image = pygame.image.load \
+            ('assets\game_over1.png').convert_alpha()
+        self.image.set_alpha(255)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.dirty = 0
+        self.e = e
+
+    def update(self, **kwargs):
+        if kwargs.get('type') == 'keydown':
+            event = kwargs.get('key')
+            #i want to restart the game if you win
+            #if event == pygame.K_SPACE:
+                #game_scene = galaga_scene.GalagaScene(self.e)
+                #engine.Engine.add_scene(self.e, game_scene)
+                #engine.Engine.set_active_scene(self.e, game_scene)
+            if event == pygame.K_ESCAPE:
+                exit()
+
+
+class EndText(game_object.GameObject):
+    def __init__(self, in_scene: "EndScene", text, x, y):
+        super().__init__(x, y, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'))
+        self.font = pygame.font.Font('freesansbold.ttf', 20)
+        self.image = self.font.render(text, True, (255, 255, 255))
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.dirty = 0
+
+class WinGameObject(game_object.GameObject):
+    def __init__(self, in_scene: "WinScene", e):
+        super().__init__(250, 90, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'))
+        self.image = pygame.image.load \
+            ('assets\you-win.png').convert_alpha()
+        self.image.set_alpha(255)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.dirty = 0
+        self.e = e
+
+    def update(self, **kwargs):
+        if kwargs.get('type') == 'keydown':
+            event = kwargs.get('key')
+            #i want to restart the game if you win
+            #if event == pygame.K_SPACE:
+                #game_scene = galaga_scene.GalagaScene(self.e)
+                #engine.Engine.add_scene(self.e, game_scene)
+                #engine.Engine.set_active_scene(self.e, game_scene)
+            if event == pygame.K_ESCAPE:
+                exit()
+
+class WinText(game_object.GameObject):
+    def __init__(self, in_scene: "WinScene", text, x, y):
+        super().__init__(x, y, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'))
+        self.font = pygame.font.Font('freesansbold.ttf', 20)
+        self.image = self.font.render(text, True, (255, 255, 255))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
