@@ -69,7 +69,7 @@ class Player(GameObject):
         self.updateTime = 500
 
     def update(self, **kwargs):
-        self.updateTime += self.scene.e.clock.get_time()
+        self.updateTime += self.scene.e.delta_time
         self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
         collided = pygame.sprite.spritecollide(self, self.scene.groups.get('drawable'), False)
         if kwargs.get('type') == 'keydown':
