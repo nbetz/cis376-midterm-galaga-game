@@ -66,18 +66,22 @@ class Player(GameObject):
         self.rect = self.image.get_rect()
         self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
         self.dirty = 0
+        self.updateTime = 500
 
     def update(self, **kwargs):
+        self.updateTime += self.scene.e.clock.get_time()
         self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
         collided = pygame.sprite.spritecollide(self, self.scene.groups.get('drawable'), False)
         if kwargs.get('type') == 'keydown':
             event = kwargs.get('key')
             if event == pygame.K_SPACE:
-                if len(collided) > 0:
-                    projectile = Projectile(self.scene, (self.body.position[0] * self.scene.b2w) + 70,
-                                            600 - (self.body.position[1] * self.scene.b2w), 0)
-                    self.scene.game_objects.append(projectile)
-                    pygame.mixer.Sound.play(self.bulletSound)
+                if self.updateTime > 500:
+                    if len(collided) > 0:
+                        projectile = Projectile(self.scene, (self.body.position[0] * self.scene.b2w) + 70,
+                                                600 - (self.body.position[1] * self.scene.b2w), 0)
+                        self.scene.game_objects.append(projectile)
+                        pygame.mixer.Sound.play(self.bulletSound)
+                        self.updateTime = 0
             elif event == pygame.K_w or event == pygame.K_UP:
                 if (self.rect.y - 15) < 0:
                     self.body.linearVelocity = (0, 0)
