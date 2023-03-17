@@ -283,6 +283,7 @@ class Projectile(GameObject):
                     if len(collided_w_projectile) > 0:
                         self.scene.game_objects.remove(collided_w_projectile[0])
                         collided_w_projectile[0].kill()
+                        collided_w_projectile[0].destroy = 1
 
                     # destroy own projectile
                     if self in self.scene.game_objects:
