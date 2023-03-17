@@ -25,8 +25,8 @@ class GalagaScene(scene.Scene):
         self.score = 0
         self.time = 0
         self.e = eng
-        self.game_objects.append(galaga_game_objects.TitleText(self, 'Score: ' + self.score.__str__(), 25, 25))
-        self.game_objects.append(galaga_game_objects.TitleText(self, 'Time: ' + self.time.__str__(), 980, 25))
+        #self.game_objects.append(galaga_game_objects.TitleText(self, 'Score: ' + self.score.__str__(), 25, 25))
+        #self.game_objects.append(galaga_game_objects.TitleText(self, 'Time: ' + self.time.__str__(), 980, 25))
         self.game_objects.append(galaga_game_objects.Upper(self))
         self.game_objects.append(galaga_game_objects.Lower(self))
 
@@ -58,8 +58,8 @@ class LevelTwo(scene.Scene):
         self.score = 0
         self.time = 0
         self.e = eng
-        self.game_objects.append(galaga_game_objects.TitleText(self, 'Score: ' + self.score.__str__(), 25, 25))
-        self.game_objects.append(galaga_game_objects.TitleText(self, 'Time: ' + self.time.__str__(), 980, 25))
+        #self.game_objects.append(galaga_game_objects.TitleText(self, 'Score: ' + self.score.__str__(), 25, 25))
+        #self.game_objects.append(galaga_game_objects.TitleText(self, 'Time: ' + self.time.__str__(), 980, 25))
         self.game_objects.append(galaga_game_objects.Upper(self))
         self.game_objects.append(galaga_game_objects.Lower(self))
 
