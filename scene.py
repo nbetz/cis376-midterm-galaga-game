@@ -6,7 +6,7 @@ Typical usage example:
   game_scene = scene.Scene()
   engine.add_scene(game_scene)
 """
-from Box2D import b2World
+from Box2D import b2World, b2ContactListener
 
 import game_object
 import pygame
@@ -46,7 +46,6 @@ class Scene:
         self.timeStep = 1.0 / 60
         self.vel_iters = 6
         self.pos_iters = 2
-        self.world = b2World((0, 0), doSleep=False)
 
     def update_all_objects(self, *args, **kwargs):
         """calls update() method for all updatable game objects in scene

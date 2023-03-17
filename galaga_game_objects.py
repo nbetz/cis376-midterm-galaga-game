@@ -10,19 +10,27 @@ import scene
 class Upper(game_object.GameObject):
     def __init__(self, in_scene: "Scene"):
         super().__init__(25, 25, in_scene, in_scene.groups.get('all_sprites'))
-        self.body = self.scene.world.CreateStaticBody(position=(0.5, 5.6))
-        shape = b2PolygonShape(box=(10, .3))
-        fixDef = b2FixtureDef(shape=shape, friction=1, restitution=0, density=.5)
-        box = self.body.CreateFixture(fixDef)
+        self.body = self.scene.world.CreateStaticBody(
+                shapes=b2PolygonShape(box=(2, .3)),
+                position=(0.5, 5.7)
+            )
+        # self.body = self.scene.world.CreateStaticBody(position=(0.5, 5.6))
+        # shape = b2PolygonShape(box=(1, .3))
+        # fixDef = b2FixtureDef(shape=shape, friction=1, restitution=0, density=.5)
+        # box = self.body.CreateFixture(fixDef)
         self.dirty = 2
 
 class Lower(game_object.GameObject):
     def __init__(self, in_scene: "Scene"):
-        super().__init__(25, 545, in_scene, in_scene.groups.get('all_sprites'))
-        self.body = self.scene.world.CreateStaticBody(position=(0.5, 0.4))
-        shape = b2PolygonShape(box=(1, .3))
-        fixDef = b2FixtureDef(shape=shape, friction=1, restitution=0, density=.5)
-        box = self.body.CreateFixture(fixDef)
+        super().__init__(25, 565, in_scene, in_scene.groups.get('all_sprites'))
+        # self.body = self.scene.world.CreateStaticBody(position=(0.5, 0.4))
+        # shape = b2PolygonShape(box=(1, .3))
+        # fixDef = b2FixtureDef(shape=shape, friction=1, restitution=0, density=.5)
+        # box = self.body.CreateFixture(fixDef)
+        self.body = self.scene.world.CreateStaticBody(
+                shapes=b2PolygonShape(box=(2, .2)),
+                position=(0.5, 0.35)
+            )
         self.dirty = 2
 
 
@@ -121,17 +129,20 @@ class Projectile(game_object.GameObject):
         self.proType = type
 
     def update(self, **kwargs):
-        self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
-        collided = pygame.sprite.spritecollide(self, self.scene.groups.get('drawable'), False)
-        # i want this to be logic that makes the bullet disappear when it collides with an enemy or goes off-screen
-        #don't think it actually does that though, i just put random values based on my estimate for screen size
-        if len(collided) > 0 or self.body.positon[1] > 300:
-            self.kill()
-            #remove from game objects
-        elif self.proType == 0:
-            # might only do this once, have a boolean that keeps track
-            #im hoping this just makes the bullet go straight at some speed?
-            self.body.ApplyLinearImpulse(b2Vec2(0, 5), self.body.position, True)
+        if self.body == None:
+            del self
+        else:
+            self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
+            collided = pygame.sprite.spritecollide(self, self.scene.groups.get('drawable'), False)
+            # i want this to be logic that makes the bullet disappear when it collides with an enemy or goes off-screen
+            #don't think it actually does that though, i just put random values based on my estimate for screen size
+            if len(collided) > 0 or self.body.positon[1] > 300:
+                self.kill()
+                #remove from game objects
+            elif self.proType == 0:
+                # might only do this once, have a boolean that keeps track
+                #im hoping this just makes the bullet go straight at some speed?
+                self.body.ApplyLinearImpulse(b2Vec2(0, 5), self.body.position, True)
 
 class TitleObject(game_object.GameObject):
     def __init__(self, in_scene: "TitleScreen", eng):
@@ -157,12 +168,26 @@ class TitleObject(game_object.GameObject):
 class TitleText(game_object.GameObject):
     def __init__(self, in_scene: "TitleScreen", text, x, y):
         super().__init__(x, y, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'))
+        self.text = text
         self.font = pygame.font.Font('freesansbold.ttf', 20)
         self.image = self.font.render(text , True, (255, 255, 255))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
         self.dirty = 0
+
+class ScoreText(TitleText):
+    def __init__(self, in_scene, x, y):
+        super().__init__(in_scene, 'Score: ' + in_scene.score.__str__(), x, y)
+        self.score = self.scene.score
+
+    def update(self, *args, **kwargs) -> None:
+        if self.score != self.scene.score:
+            self.image = self.font.render('Score: ' + self.scene.score.__str__(), True, (255, 255, 255))
+            self.rect = self.image.get_rect()
+            self.rect.x = self.x
+            self.rect.y = self.y
+            self.dirty = 0
 
 class GameOverObject(game_object.GameObject):
     def __init__(self, in_scene: "EndScene", e):
