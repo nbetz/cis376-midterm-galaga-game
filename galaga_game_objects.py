@@ -20,7 +20,7 @@ class Lower(game_object.GameObject):
     def __init__(self, in_scene: "Scene"):
         super().__init__(25, 545, in_scene, in_scene.groups.get('all_sprites'))
         self.body = self.scene.world.CreateStaticBody(position=(0.5, 0.4))
-        shape = b2PolygonShape(box=(1, .3))
+        shape = b2PolygonShape(box=(10, .3))
         fixDef = b2FixtureDef(shape=shape, friction=1, restitution=0, density=.5)
         box = self.body.CreateFixture(fixDef)
         self.dirty = 2
