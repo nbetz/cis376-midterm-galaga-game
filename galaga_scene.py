@@ -8,6 +8,14 @@ import scene
 
 
 class GalagaScene(scene.Scene):
+    """
+    class that creates a specific scene for our galaga levels
+
+    Attributes:
+        groups for enemies, player, enemies shot, and player shot
+        information for Box2D
+        Upper and lower bounds for the player
+    """
     def __init__(self, eng):
         super().__init__()
         enemies = pygame.sprite.Group()
@@ -40,6 +48,9 @@ class GalagaScene(scene.Scene):
 
 
 class LevelTwo(scene.Scene):
+    """
+    class that is exactly like a galaga scene just has different enemies
+    """
     def __init__(self, eng):
         super().__init__()
         enemies = pygame.sprite.Group()
@@ -81,6 +92,9 @@ class LevelTwo(scene.Scene):
 
 
 class LevelThree(LevelTwo):
+    """
+    class that is exactly like a galaga scene just has different enemies
+    """
     def __init__(self, eng):
         super().__init__(eng)
 
@@ -100,6 +114,13 @@ class LevelThree(LevelTwo):
 
 
 class TitleScreen(scene.Scene):
+    """
+    class that holds our opening screen
+
+    Attributes:
+        Title logo
+        Text to explain the game
+    """
     def __init__(self, eng):
         super().__init__()
         self.game_objects.append(galaga_game_objects.TitleObject(self, eng))
@@ -125,7 +146,13 @@ class TitleScreen(scene.Scene):
 #         pass
 
 class WinScene(scene.Scene):
+    """
+    class that holds our win scene
 
+    Attributes:
+        Winner sprite
+        Text on how to exit the game
+    """
     def __init__(self, eng):
         super().__init__()
         self.game_objects.append(galaga_game_objects.WinGameObject(self, eng))
