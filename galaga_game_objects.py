@@ -50,6 +50,9 @@ class TitleObject(game_object.GameObject):
     """
     def __init__(self, in_scene: "TitleScreen", eng):
         super().__init__(225, 90, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'))
+        """
+        taken from https://www.pngwing.com/en/free-png-sgcny, license not for commercial use, but available to use
+        """
         self.image = pygame.image.load('assets\Galaga-Logo-PNG-File.png').convert_alpha()
         self.image.set_alpha(255)
         self.rect = self.image.get_rect()
