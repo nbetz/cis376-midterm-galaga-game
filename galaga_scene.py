@@ -33,15 +33,14 @@ class GalagaScene(scene.Scene):
         self.score = 0
         self.time = 0
         self.e = eng
-        #self.game_objects.append(galaga_game_objects.TitleText(self, 'Score: ' + self.score.__str__(), 25, 25))
-        #self.game_objects.append(galaga_game_objects.TitleText(self, 'Time: ' + self.time.__str__(), 980, 25))
+        self.game_objects.append(galaga_game_objects.ScoreText(self, 25, 25))
         self.game_objects.append(galaga_game_objects.Upper(self))
         self.game_objects.append(galaga_game_objects.Lower(self))
 
 
     def check_win(self):
         if not self.groups.get("enemies"):
-            level_two = LevelTwo(self.e)
+            level_two = LevelTwo(self.e, self.score, self.user_object.rect.centerx, self.user_object.rect.centery)
             self.e.add_scene(level_two)
             self.e.set_active_scene(level_two)
 
@@ -51,7 +50,7 @@ class LevelTwo(scene.Scene):
     """
     class that is exactly like a galaga scene just has different enemies
     """
-    def __init__(self, eng):
+    def __init__(self, eng, score, player_x, player_y):
         super().__init__()
         enemies = pygame.sprite.Group()
         player = pygame.sprite.Group()
@@ -66,27 +65,34 @@ class LevelTwo(scene.Scene):
         self.vel_iters = 6
         self.pos_iters = 2
         self.world = b2World((0, 0), doSleep=False)
-        self.score = 0
+        self.score = score
         self.time = 0
         self.e = eng
-        #self.game_objects.append(galaga_game_objects.TitleText(self, 'Score: ' + self.score.__str__(), 25, 25))
-        #self.game_objects.append(galaga_game_objects.TitleText(self, 'Time: ' + self.time.__str__(), 980, 25))
+        self.game_objects.append(galaga_game_objects.ScoreText(self, 25, 25))
         self.game_objects.append(galaga_game_objects.Upper(self))
         self.game_objects.append(galaga_game_objects.Lower(self))
+        self.playerx = player_x
+        self.playery = player_y
 
     def initial_grid(self, **kwargs):
         self.game_objects.append(game_object.Updater(self))
-        self.user_object = game_object.Player(self)
+        self.user_object = game_object.Player(self, x=self.playerx, y=self.playery)
         self.game_objects.append(self.user_object)
         for rows in range(100, 550, 75):
             col_count = 0
             for cols in range(400, 850, 75):
                 col_count += 1
+                if 4 > col_count == 4:
+                    cols = cols + 15
+                if col_count == 5:
+                    cols = cols + 30
+                if col_count == 6:
+                    cols = cols + 45
                 self.game_objects.append(game_object.Enemy(self, cols, rows, col_count))
 
     def check_win(self):
         if not self.groups.get("enemies"):
-            level_three = LevelThree(self.e)
+            level_three = LevelThree(self.e, self.score, self.user_object.rect.centerx, self.user_object.rect.centery)
             self.e.add_scene(level_three)
             self.e.set_active_scene(level_three)
 
@@ -95,15 +101,20 @@ class LevelThree(LevelTwo):
     """
     class that is exactly like a galaga scene just has different enemies
     """
-    def __init__(self, eng):
-        super().__init__(eng)
+    def __init__(self, eng, score, player_x, player_y):
+        super().__init__(eng, score, player_x, player_y)
+        self.playerx = player_x
+        self.playery = player_y
+        self.game_objects.append(galaga_game_objects.ScoreText(self, 25, 25))
+        self.game_objects.append(galaga_game_objects.Upper(self))
+        self.game_objects.append(galaga_game_objects.Lower(self))
 
     def initial_grid(self, **kwargs):
         self.game_objects.append(game_object.Updater(self))
-        self.user_object = game_object.Player(self)
+        self.user_object = game_object.Player(self, x=self.playerx, y=self.playery)
         self.game_objects.append(self.user_object)
         for rows in range(100, 550, 75):
-            for cols in range(400, 850, 75):
+            for cols in range(400, 952, 86):
                 self.game_objects.append(game_object.Enemy(self, cols, rows, 5))
 
     def check_win(self):

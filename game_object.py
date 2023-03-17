@@ -2,16 +2,15 @@
 
 Provides basic functions for creating GameObjects for a game.
 """
+import math
 import random
 
 import pygame
-from Box2D import b2Vec2, b2FixtureDef, b2PolygonShape
+from Box2D import b2Vec2, b2FixtureDef, b2PolygonShape, b2DestructionListener
 import scene
 import engine
 
 from pygame.sprite import AbstractGroup
-
-
 
 
 class GameObject(pygame.sprite.DirtySprite):
@@ -38,6 +37,7 @@ class GameObject(pygame.sprite.DirtySprite):
         self.last_y = y
         self.scene = in_scene
 
+
 class Updater(GameObject):
     def __init__(self, in_scene: "Scene"):
         super().__init__(0, 0, in_scene, in_scene.groups.get('all_sprites'))
@@ -45,55 +45,69 @@ class Updater(GameObject):
     def update(self, **kwargs):
         self.scene.world.Step(self.scene.timeStep, self.scene.vel_iters, self.scene.pos_iters)
         self.scene.world.ClearForces()
+        player_shot = self.scene.groups.get('player_shot')
+        enemy_shot = self.scene.groups.get('enemy_shot')
+        player_shot.update(type='pos')
+        enemy_shot.update(type='pos')
 
 
 class Player(GameObject):
     pygame.mixer.init()
     bulletSound = pygame.mixer.Sound("assets/fire.wav")
 
-    def __init__(self, in_scene: "Scene"):
-        super().__init__(75, 400, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'),
+    def __init__(self, in_scene: "Scene", x=75, y=400):
+        print(x, y)
+        super().__init__(x, y, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'),
                          in_scene.groups.get('player'))
-        self.body = self.scene.world.CreateDynamicBody(position=(0.75, 4))
+        # box2d stuff
+        self.body = self.scene.world.CreateDynamicBody(position=(x * self.scene.w2b, (600 - y) * self.scene.w2b))
         shape = b2PolygonShape(box=(.5, .3))
         fixDef = b2FixtureDef(shape=shape, friction=1, restitution=0, density=.5)
         box = self.body.CreateFixture(fixDef)
-        self.dirty = 2
-        d = .25 * self.scene.b2w * 2
+
         self.image = pygame.image.load("assets/Ship5.png")
         self.image.convert_alpha()
-        # TODO maybe use image center?
         self.rect = self.image.get_rect()
         self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
         self.dirty = 0
+        self.updateTime = 500
 
     def update(self, **kwargs):
+        # update position and firing cooldown timer
+        self.updateTime += self.scene.e.delta_time
         self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
+
         collided = pygame.sprite.spritecollide(self, self.scene.groups.get('drawable'), False)
         if kwargs.get('type') == 'keydown':
             event = kwargs.get('key')
+            # fire on space
             if event == pygame.K_SPACE:
-                if len(collided) > 0:
-                    projectile = Projectile(self.scene, (self.body.position[0] * self.scene.b2w) + 70,
-                                            600 - (self.body.position[1] * self.scene.b2w), 0)
-                    self.scene.game_objects.append(projectile)
-                    pygame.mixer.Sound.play(self.bulletSound)
+                # firing cooldown
+                if self.updateTime > 500:
+                    if len(collided) > 0:
+                        projectile = Projectile(self.scene, (self.body.position[0] * self.scene.b2w) + 70,
+                                                605 - (self.body.position[1] * self.scene.b2w), 0)
+                        self.scene.game_objects.append(projectile)
+                        pygame.mixer.Sound.play(self.bulletSound)
+                        self.updateTime = 0
+            # move up
             elif event == pygame.K_w or event == pygame.K_UP:
                 if (self.rect.y - 15) < 0:
                     self.body.linearVelocity = (0, 0)
                 else:
                     self.body.linearVelocity = (0, 0)
                     self.body.ApplyLinearImpulse(b2Vec2(0, 0.3), self.body.position, True)
-                #self.body.ApplyForce(b2Vec2(0, 3), self.body.position, True)
+
+            # move down
             elif event == pygame.K_s or event == pygame.K_DOWN:
                 if (self.rect.y + 15) > 600:
                     self.body.linearVelocity = (0, 0)
                 else:
                     self.body.linearVelocity = (0, 0)
                     self.body.ApplyLinearImpulse(b2Vec2(0, -0.3), self.body.position, True)
-                #self.body.ApplyForce(b2Vec2(0, -3), self.body.position, True)
             self.dirty = 0
 
+        # stop movement when letting go of direction key
         if kwargs.get('type') == 'keyup':
             event = kwargs.get('key')
             if event == pygame.K_w or event == pygame.K_UP:
@@ -143,11 +157,13 @@ class Enemy(GameObject):
             self.type = 3
 
     def update(self, **kwargs):
-        # print(self.y)
+        # move down every 10th frame for first 30 frames
         if self.flag <= 30 and self.flag % 10 == 0:
             self.flag = self.flag + 1
             self.y = self.y + 10
             self.rect.y = self.rect.y + 10
+
+        # move up every 10th frme for first 30 frames
         elif 30 < self.flag <= 60 and self.flag % 10 == 0:
             self.flag = self.flag + 1
             self.y = self.y - 10
@@ -156,9 +172,12 @@ class Enemy(GameObject):
             self.flag = 1
         else:
             self.flag = self.flag + 1
-            if random.randint(0, 10000) < 5:
+
+            # choose to fire randomly
+            if random.randint(0, 10000) < 8:
                 projectile = Projectile(self.scene, (self.x - 50),
                                         self.y, self.type)
+                self.scene.game_objects.append(projectile)
 
 
 class Projectile(GameObject):
@@ -166,72 +185,150 @@ class Projectile(GameObject):
 
     # x pos and y pos can be player/enemy position or some value based on the positon
     # type will be a number that defines what type of projectile it needs to be
-    def __init__(self, in_scene: "GalagaScene", xPos: int, yPos: int, projectile_type: int):
+    def __init__(self, in_scene: "GalagaScene", x_pos: int, y_pos: int, projectile_type: int):
+        # player projectile
         if projectile_type == 0:
-            super().__init__(xPos, yPos, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'),
-                         in_scene.groups.get('player_shot'))
+            super().__init__(x_pos, y_pos, in_scene, in_scene.groups.get('all_sprites'),
+                             in_scene.groups.get('drawable'),
+                             in_scene.groups.get('player_shot'))
+        # enemy projectile
         else:
-            super().__init__(xPos, yPos, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'),
+            super().__init__(x_pos, y_pos, in_scene, in_scene.groups.get('all_sprites'),
+                             in_scene.groups.get('drawable'),
                              in_scene.groups.get('enemy_shot'))
-        self.body = self.scene.world.CreateDynamicBody(position=(xPos * self.scene.w2b, (600 - yPos) * self.scene.w2b))
-        shape = b2PolygonShape(box=(.15, .03))
-        # include an if statement here that changes these based on projectile type
-        fixDef = b2FixtureDef(shape=shape, friction=0.3, restitution=.5, density=.25)
+
+        # create box2d body
+        self.body = self.scene.world.CreateDynamicBody(
+            position=(x_pos * self.scene.w2b, (600 - y_pos) * self.scene.w2b))
+        shape = b2PolygonShape(box=(.10, .04))
+        fixDef = b2FixtureDef(shape=shape, friction=0.3, restitution=.5, density=.65)
         box = self.body.CreateFixture(fixDef)
-        self.dirty = 2
-        diameter = .05 * self.scene.b2w * 2
-        # self.image = pygame.image.load("assets/shot.png")
-        # self.image.convert_alpha()
-        # self.rect = self.image.get_rect()
+
         if projectile_type == 0:
             self.image = pygame.image.load("assets/shot.png")
         else:
-            # CHANGE
             self.image = pygame.image.load("assets/shot-flip.png")
-            #self.image = pygame.image.load("assets/shot-flip.png")
+
         self.image.convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
         self.dirty = 0
         self.type = projectile_type
+        self.destroy = 0
+        # player projectile
         if projectile_type == 0:
             self.body.ApplyForce(b2Vec2(1, 0), self.body.position, True)
+
+        # enemy projectile type 1
         elif projectile_type == 1:
-            self.body.ApplyForce(b2Vec2(-1, 0), self.body.position, True)
-        elif projectile_type == 2 or projectile_type == 3:
+            self.body.ApplyForce(b2Vec2(-0.6, 0), self.body.position, True)
+
+        # enemy projectile type 2 (fire at player with min force of -0.45 in x direction)
+        elif projectile_type == 2:
             player_body_position = self.scene.user_object.body.position
-            self.body.ApplyForce(b2Vec2((player_body_position[0] - self.body.position[0])/10,
-                                        (player_body_position[1] - self.body.position[1])/10), self.body.position, True)
+            self.body.mass = self.body.mass * 7
+            if (player_body_position[0] - self.body.position[0]) > -0.45:
+                self.body.ApplyForce(b2Vec2(-0.45,
+                                            (player_body_position[1] - self.body.position[1])), self.body.position,
+                                     True)
+            else:
+                self.body.ApplyForce(b2Vec2((player_body_position[0] - self.body.position[0]),
+                                            (player_body_position[1] - self.body.position[1])), self.body.position,
+                                     True)
+
+        # enemy projectile type 3 (homing projectile with min force of -0.45 in x direction)
+        elif projectile_type == 3:
+            player_body_position = self.scene.user_object.body.position
+            if (player_body_position[1] - self.body.position[1]) / 8 > -0.45:
+                self.body.ApplyForce(b2Vec2(-0.45, (player_body_position[1] - self.body.position[1]) / 8),
+                                     self.body.position, True)
+            else:
+                self.body.ApplyForce(b2Vec2((player_body_position[0] - self.body.position[0]) / 8,
+                                            (player_body_position[1] - self.body.position[1])) / 8, self.body.position,
+                                     True)
 
     def update(self, **kwargs):
-        self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
-        if self.type == 0:
-            collided = pygame.sprite.spritecollide(self, self.scene.groups.get('enemies'), False)
-            collided_w_projectile = pygame.sprite.spritecollide(self, self.scene.groups.get('enemy_shot'), False)
+        if self.destroy == 1:
+            self.scene.world.DestroyBody(self.body)
         else:
-            collided = pygame.sprite.spritecollide(self, self.scene.groups.get('player'), False)
-            collided_w_projectile = pygame.sprite.spritecollide(self, self.scene.groups.get('player_shot'), False)
-
-        if len(collided) > 0 or len(collided_w_projectile) > 0 or self.body.position[0] > 9 or self.body.position[0] < 0:
-            self.kill()
-            if len(collided) > 0:
-                self.scene.score = self.scene.score + 100
-                collided[0].kill()
-                if self.type > 0:
-                    pygame.mixer.Sound.play(self.explosionSound)
-                    game_scene = scene.EndScene(engine)
-                    self.scene.e.add_scene(game_scene)
-                    self.scene.e.set_active_scene(game_scene)
-                    print('Game Over!')
-            if len(collided_w_projectile) > 0:
-                collided_w_projectile[0].kill()
-        if self.type == 3:
-            self.body.linearVelocity = (0, 0)
-            player_body_position = self.scene.user_object.body.position
-            if (player_body_position[1] - self.body.position[1])/10 > -0.3:
-                self.body.ApplyForce(b2Vec2(-0.3, (player_body_position[1] - self.body.position[1])/10), self.body.position, True)
+            if kwargs.get('type') == 'pos':
+                self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
             else:
-                self.body.ApplyForce(b2Vec2((player_body_position[0] - self.body.position[0]/10),
-                                        (player_body_position[1] - self.body.position[1])/10), self.body.position, True)
-        self.dirty = 0
+                self.rect.center = self.body.position[0] * self.scene.b2w, 600 - self.body.position[1] * self.scene.b2w
 
+                if self.type == 0:
+                    collided = pygame.sprite.spritecollide(self, self.scene.groups.get('enemies'), False)
+                    collided_w_projectile = pygame.sprite.spritecollide(self, self.scene.groups.get('enemy_shot'), False)
+                else:
+                    collided = pygame.sprite.spritecollide(self, self.scene.groups.get('player'), False)
+                    collided_w_projectile = pygame.sprite.spritecollide(self, self.scene.groups.get('player_shot'), False)
+
+                if len(collided) > 0 or len(collided_w_projectile) > 0 or self.body.position[0] > 9\
+                        or self.body.position[0] < 0:
+                    self.kill()
+                    if len(collided) > 0:
+                        self.scene.score = self.scene.score + 100
+                        collided[0].kill()
+                        self.scene.game_objects.remove(collided[0])
+
+                        # game over when collided with player
+                        if self.type > 0:
+                            pygame.mixer.Sound.play(self.explosionSound)
+                            game_scene = scene.EndScene(engine)
+                            self.scene.e.add_scene(game_scene)
+                            self.scene.e.set_active_scene(game_scene)
+                            print('Game Over!')
+
+                    # yeet projectile out of existence if
+                    if len(collided_w_projectile) > 0:
+                        self.scene.game_objects.remove(collided_w_projectile[0])
+                        collided_w_projectile[0].kill()
+
+                    # destroy own projectile
+                    if self in self.scene.game_objects:
+                        self.scene.game_objects.remove(self)
+                    self.scene.world.DestroyBody(self.body)
+                    del self
+
+                # if homing enemy missile, reset the force towards the player
+                elif self.type == 3:
+                    self.body.linearVelocity = (0, 0)
+                    player_body_position = self.scene.user_object.body.position
+                    if (player_body_position[1] - self.body.position[1]) / 8 > -0.45:
+                        self.body.ApplyForce(b2Vec2(-0.45, (player_body_position[1] - self.body.position[1]) / 8),
+                                             self.body.position, True)
+                    else:
+                        self.body.ApplyForce(b2Vec2((player_body_position[0] - self.body.position[0]) / 8,
+                                                    (player_body_position[1] - self.body.position[1])) / 8,
+                                             self.body.position, True)
+                    self.dirty = 0
+
+
+class GameOverObject(GameObject):
+    def __init__(self, in_scene: "EndScene", e):
+        super().__init__(340, 90, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'))
+        self.image = pygame.image.load \
+            ('assets\game_over1.png').convert_alpha()
+        self.image.set_alpha(255)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.dirty = 0
+        self.e = e
+
+    def update(self, **kwargs):
+        if kwargs.get('type') == 'keydown':
+            event = kwargs.get('key')
+            if event == pygame.K_ESCAPE:
+                exit()
+
+
+class EndText(GameObject):
+    def __init__(self, in_scene: "EndScene", text, x, y):
+        super().__init__(x, y, in_scene, in_scene.groups.get('all_sprites'), in_scene.groups.get('drawable'))
+        self.font = pygame.font.Font('freesansbold.ttf', 20)
+        self.image = self.font.render(text, True, (255, 255, 255))
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.dirty = 0
